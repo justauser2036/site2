@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Play, Pause, RotateCcw, Save, Settings, Trophy, Clock, Calendar, Zap, Heart, Moon, Users, Briefcase, Home, Utensils, Dumbbell, Bath, Gamepad2, Bed, Monitor, Sofa, Tv, BookOpen, Car, Smartphone, Coffee, Shower, Sparkles } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Save, Settings, Trophy, Clock, Calendar, Zap, Heart, Moon, Users, Briefcase, Home, Utensils, Dumbbell, Bath, Gamepad2, Bed, Monitor, Sofa, Tv, BookOpen, Car, Smartphone, Coffee, ShowerHead as Shower, Sparkles } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 interface DreamStoryGameProps {
