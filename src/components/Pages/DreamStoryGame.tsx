@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Play, Pause, RotateCcw, Home, Users, Briefcase, Heart, Zap, Moon } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Save, Settings, Trophy, Clock, Calendar, Zap, Heart, Moon, Users, Briefcase, Home, Utensils, Dumbbell, Bath, Gamepad2, Bed, Monitor, Sofa, Tv, BookOpen, Car, Smartphone, Coffee, Shower, Sparkles } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 interface DreamStoryGameProps {
@@ -34,6 +34,7 @@ interface Situation {
   minute: number;
   title: string;
   description: string;
+  icon: string;
   yesOption: {
     effects: {
       health?: number;
@@ -68,6 +69,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Reunião Matinal',
     description: 'Seu chefe pediu para você chegar 1h mais cedo no trabalho para uma reunião importante.',
+    icon: '💼',
     yesOption: {
       effects: { productivity: 15, sleep: -20, energy: -10 },
       score: 10,
@@ -88,6 +90,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Trânsito Parado',
     description: 'O trânsito está parado. Você pode ir pela rota mais longa a pé ou esperar no carro.',
+    icon: '🚗',
     yesOption: {
       effects: { health: 10, energy: -15, productivity: 5 },
       score: 5,
@@ -108,6 +111,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Festa com Amigos',
     description: 'Alex foi chamado para uma festa com os amigos que promete ir até tarde.',
+    icon: '🎉',
     yesOption: {
       effects: { social: 20, health: -10, sleep: -25, energy: -20 },
       score: -10,
@@ -128,6 +132,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Almoço em Família',
     description: 'Alex pode visitar seus pais para um almoço de família especial.',
+    icon: '👨‍👩‍👦',
     yesOption: {
       effects: { social: 15, productivity: -5, energy: -10 },
       score: 5,
@@ -148,6 +153,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Soneca da Tarde',
     description: 'Alex está exausto. Uma soneca rápida de 1 hora pode ajudar a recuperar as energias.',
+    icon: '😴',
     yesOption: {
       effects: { sleep: 20, energy: 15, productivity: -10 },
       score: 5,
@@ -168,6 +174,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Almoço Esquecido',
     description: 'Alex esqueceu o almoço em casa. Pode comprar algo rápido na rua ou ficar sem comer.',
+    icon: '🍽️',
     yesOption: {
       effects: { health: -10, energy: 10, productivity: 5 },
       score: 0,
@@ -188,6 +195,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Encontro Romântico',
     description: 'Alex foi convidado para um encontro romântico com uma colega do trabalho.',
+    icon: '💕',
     yesOption: {
       effects: { social: 10, health: -5, sleep: -10, energy: -10 },
       score: 15,
@@ -208,6 +216,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Ajuda ao Colega',
     description: 'Um colega de trabalho pediu ajuda para terminar uma tarefa em equipe urgente.',
+    icon: '🤝',
     yesOption: {
       effects: { productivity: 10, energy: -10, social: 5 },
       score: 5,
@@ -228,6 +237,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Corrida Matinal',
     description: 'Alex pode acordar cedo e ir correr no parque antes do trabalho.',
+    icon: '🏃‍♂️',
     yesOption: {
       effects: { health: 20, sleep: -20, energy: 10 },
       score: 10,
@@ -248,6 +258,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Noite de Filme',
     description: 'Alex pode assistir a um filme sozinho para relaxar antes da semana começar.',
+    icon: '🎬',
     yesOption: {
       effects: { social: 5, sleep: -10, energy: -5 },
       score: 5,
@@ -268,6 +279,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Compras por Impulso',
     description: 'Alex viu uma promoção irresistível online. Pode gastar dinheiro em algo que não precisa.',
+    icon: '🛒',
     yesOption: {
       effects: { social: 5, productivity: -15, energy: -5 },
       score: -15,
@@ -288,6 +300,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Dor de Cabeça',
     description: 'Alex acordou com uma forte dor de cabeça. Pode tomar remédio e descansar ou tentar trabalhar assim mesmo.',
+    icon: '🤕',
     yesOption: {
       effects: { health: 10, energy: 5, productivity: -10 },
       score: 5,
@@ -308,6 +321,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Briga com Amigo',
     description: 'Alex teve uma discussão séria com seu melhor amigo. Pode tentar resolver ou deixar para depois.',
+    icon: '😠',
     yesOption: {
       effects: { social: 15, energy: -10, productivity: -5 },
       score: 10,
@@ -328,6 +342,7 @@ const situations: Situation[] = [
     minute: 0,
     title: 'Viagem Bate-volta',
     description: 'Um amigo convidou Alex para uma viagem bate-volta para a praia no último dia do desafio.',
+    icon: '🏖️',
     yesOption: {
       effects: { social: 25, health: 10, energy: -15, productivity: -20 },
       score: 15,
@@ -349,6 +364,7 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
   const [currentSituation, setCurrentSituation] = useState<Situation | null>(null);
   const [showConsequence, setShowConsequence] = useState<string | null>(null);
   const [triggeredSituations, setTriggeredSituations] = useState<Set<string>>(new Set());
+  const [showSaveMessage, setShowSaveMessage] = useState(false);
 
   const [gameState, setGameState] = useState<GameState>({
     day: 1,
@@ -372,23 +388,48 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
   });
 
   const rooms = {
-    bedroom: { name: 'Quarto', activities: ['sleep', 'computer'] },
-    living: { name: 'Sala', activities: ['relax', 'videogame'] },
-    kitchen: { name: 'Cozinha', activities: ['eat', 'drinkWater'] },
-    gym: { name: 'Academia', activities: ['exercise'] },
-    bathroom: { name: 'Banheiro', activities: ['shower', 'skincare'] }
+    bedroom: { 
+      name: 'Quarto', 
+      icon: Bed,
+      color: 'from-purple-500/20 to-indigo-500/20',
+      activities: ['sleep', 'computer'] 
+    },
+    living: { 
+      name: 'Sala', 
+      icon: Sofa,
+      color: 'from-green-500/20 to-emerald-500/20',
+      activities: ['relax', 'videogame'] 
+    },
+    kitchen: { 
+      name: 'Cozinha', 
+      icon: Utensils,
+      color: 'from-orange-500/20 to-red-500/20',
+      activities: ['eat', 'drinkWater'] 
+    },
+    gym: { 
+      name: 'Academia', 
+      icon: Dumbbell,
+      color: 'from-gray-500/20 to-slate-500/20',
+      activities: ['exercise'] 
+    },
+    bathroom: { 
+      name: 'Banheiro', 
+      icon: Bath,
+      color: 'from-blue-500/20 to-cyan-500/20',
+      activities: ['shower', 'skincare'] 
+    }
   };
 
   const activities = {
-    sleep: { name: 'Dormir', duration: 480, effects: { sleep: 40, energy: 30, health: 10 }, icon: '😴' },
-    eat: { name: 'Comer', duration: 30, effects: { health: 15, energy: 20 }, icon: '🍽️' },
-    exercise: { name: 'Exercitar', duration: 60, effects: { health: 25, energy: -10, sleep: 10 }, icon: '💪' },
-    relax: { name: 'Relaxar', duration: 120, effects: { energy: 15, social: 5, sleep: 5 }, icon: '😌' },
-    drinkWater: { name: 'Beber Água', duration: 5, effects: { health: 10, energy: 5 }, icon: '💧' },
-    shower: { name: 'Banho', duration: 20, effects: { health: 10, energy: 10, social: 5 }, icon: '🚿' },
-    computer: { name: 'Computador', duration: 90, effects: { productivity: 20, energy: -5, social: -5 }, icon: '💻' },
-    videogame: { name: 'Videogame', duration: 120, effects: { energy: -5, social: 10, productivity: -10 }, icon: '🎮' },
-    skincare: { name: 'Cuidados', duration: 15, effects: { health: 5, social: 10 }, icon: '🧴' }
+    sleep: { name: 'Dormir', duration: 480, effects: { sleep: 40, energy: 30, health: 10 }, icon: Moon, color: 'text-indigo-400' },
+    eat: { name: 'Comer', duration: 30, effects: { health: 15, energy: 20 }, icon: Utensils, color: 'text-orange-400' },
+    exercise: { name: 'Exercitar', duration: 60, effects: { health: 25, energy: -10, sleep: 10 }, icon: Dumbbell, color: 'text-red-400' },
+    relax: { name: 'Relaxar', duration: 120, effects: { energy: 15, social: 5, sleep: 5 }, icon: Sofa, color: 'text-green-400' },
+    drinkWater: { name: 'Beber Água', duration: 5, effects: { health: 10, energy: 5 }, icon: Coffee, color: 'text-blue-400' },
+    shower: { name: 'Banho', duration: 20, effects: { health: 10, energy: 10, social: 5 }, icon: Shower, color: 'text-cyan-400' },
+    computer: { name: 'Computador', duration: 90, effects: { productivity: 20, energy: -5, social: -5 }, icon: Monitor, color: 'text-purple-400' },
+    videogame: { name: 'Videogame', duration: 120, effects: { energy: -5, social: 10, productivity: -10 }, icon: Gamepad2, color: 'text-pink-400' },
+    skincare: { name: 'Cuidados', duration: 15, effects: { health: 5, social: 10 }, icon: Sparkles, color: 'text-yellow-400' }
   };
 
   const checkForSituations = (day: number, hour: number, minute: number) => {
@@ -449,6 +490,31 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
     // Mostrar consequência
     setShowConsequence(option.consequence);
     setCurrentSituation(null);
+  };
+
+  const saveGame = () => {
+    const saveData = {
+      gameState,
+      triggeredSituations: Array.from(triggeredSituations),
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('dreamStoryGameSave', JSON.stringify(saveData));
+    setShowSaveMessage(true);
+    setTimeout(() => setShowSaveMessage(false), 2000);
+  };
+
+  const loadGame = () => {
+    const savedData = localStorage.getItem('dreamStoryGameSave');
+    if (savedData) {
+      try {
+        const { gameState: savedGameState, triggeredSituations: savedSituations } = JSON.parse(savedData);
+        setGameState(savedGameState);
+        setTriggeredSituations(new Set(savedSituations));
+      } catch (error) {
+        console.error('Erro ao carregar jogo:', error);
+      }
+    }
   };
 
   const startGameLoop = () => {
@@ -540,6 +606,11 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
     return () => stopGameLoop();
   }, [gameState.isPlaying, gameState.gameSpeed]);
 
+  useEffect(() => {
+    // Carregar jogo automaticamente ao iniciar
+    loadGame();
+  }, []);
+
   const toggleGame = () => {
     setGameState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
   };
@@ -569,6 +640,7 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
     setCurrentSituation(null);
     setShowConsequence(null);
     setTriggeredSituations(new Set());
+    localStorage.removeItem('dreamStoryGameSave');
   };
 
   const changeRoom = (roomId: string) => {
@@ -589,19 +661,19 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
   };
 
   const formatTime = (day: number, hour: number, minute: number) => {
-    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
     const dayName = days[(day - 1) % 7];
-    return `${dayName} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    return `${dayName}, ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
   };
 
   const getFactorIcon = (factor: string) => {
     switch (factor) {
-      case 'health': return <Heart className="w-4 h-4" />;
-      case 'sleep': return <Moon className="w-4 h-4" />;
-      case 'energy': return <Zap className="w-4 h-4" />;
-      case 'productivity': return <Briefcase className="w-4 h-4" />;
-      case 'social': return <Users className="w-4 h-4" />;
-      default: return null;
+      case 'health': return Heart;
+      case 'sleep': return Moon;
+      case 'energy': return Zap;
+      case 'productivity': return Briefcase;
+      case 'social': return Users;
+      default: return Heart;
     }
   };
 
@@ -616,50 +688,61 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
     return baseColors[factor as keyof typeof baseColors] || 'text-gray-400';
   };
 
+  const getFactorBgColor = (factor: string, value: number) => {
+    const bgColors = {
+      health: value >= 70 ? 'bg-green-500' : value >= 40 ? 'bg-yellow-500' : 'bg-red-500',
+      sleep: value >= 70 ? 'bg-blue-500' : value >= 40 ? 'bg-yellow-500' : 'bg-red-500',
+      energy: value >= 70 ? 'bg-orange-500' : value >= 40 ? 'bg-yellow-500' : 'bg-red-500',
+      productivity: value >= 70 ? 'bg-purple-500' : value >= 40 ? 'bg-yellow-500' : 'bg-red-500',
+      social: value >= 70 ? 'bg-pink-500' : value >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+    };
+    return bgColors[factor as keyof typeof bgColors] || 'bg-gray-500';
+  };
+
   // Modal de Situação
   if (currentSituation) {
     return (
       <div className={`min-h-screen transition-colors duration-300 ${
         isDark ? 'bg-slate-950' : 'bg-gradient-to-br from-white via-emerald-50/80 to-emerald-100/60'
       }`}>
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className={`max-w-md w-full rounded-2xl p-6 border transition-colors duration-300 ${
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className={`max-w-md w-full rounded-3xl p-8 border-2 transition-all duration-300 transform scale-100 ${
             isDark 
-              ? 'bg-slate-900 border-slate-700' 
-              : 'bg-white border-gray-200 shadow-xl'
+              ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-600 shadow-2xl' 
+              : 'bg-gradient-to-br from-white to-gray-50 border-gray-300 shadow-2xl'
           }`}>
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">⚠️</span>
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span className="text-3xl">{currentSituation.icon}</span>
               </div>
-              <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${
+              <h3 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
                 isDark ? 'text-white' : 'text-gray-900'
               }`}>
                 {currentSituation.title}
               </h3>
-              <p className={`text-sm leading-relaxed transition-colors duration-300 ${
+              <p className={`text-base leading-relaxed transition-colors duration-300 ${
                 isDark ? 'text-slate-300' : 'text-gray-700'
               }`}>
                 {currentSituation.description}
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <button
                 onClick={() => handleSituationChoice('yes')}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-xl font-medium transition-colors"
+                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
-                Sim
+                ✅ Sim
               </button>
               <button
                 onClick={() => handleSituationChoice('no')}
-                className={`w-full py-3 px-4 rounded-xl font-medium transition-colors border ${
+                className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-200 transform hover:scale-105 border-2 shadow-lg ${
                   isDark 
-                    ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900 border-gray-300'
+                    ? 'bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white border-slate-600' 
+                    : 'bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 border-gray-300'
                 }`}
               >
-                Não
+                ❌ Não
               </button>
             </div>
           </div>
@@ -674,22 +757,22 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
       <div className={`min-h-screen transition-colors duration-300 ${
         isDark ? 'bg-slate-950' : 'bg-gradient-to-br from-white via-emerald-50/80 to-emerald-100/60'
       }`}>
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className={`max-w-md w-full rounded-2xl p-6 border transition-colors duration-300 ${
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className={`max-w-md w-full rounded-3xl p-8 border-2 transition-all duration-300 transform scale-100 ${
             isDark 
-              ? 'bg-slate-900 border-slate-700' 
-              : 'bg-white border-gray-200 shadow-xl'
+              ? 'bg-gradient-to-br from-slate-900 to-slate-800 border-slate-600 shadow-2xl' 
+              : 'bg-gradient-to-br from-white to-gray-50 border-gray-300 shadow-2xl'
           }`}>
             <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📖</span>
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span className="text-3xl">📖</span>
               </div>
-              <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
+              <h3 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                 isDark ? 'text-white' : 'text-gray-900'
               }`}>
-                Consequência
+                Resultado
               </h3>
-              <p className={`text-sm leading-relaxed mb-6 transition-colors duration-300 ${
+              <p className={`text-base leading-relaxed mb-8 transition-colors duration-300 ${
                 isDark ? 'text-slate-300' : 'text-gray-700'
               }`}>
                 {showConsequence}
@@ -699,9 +782,9 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
                   setShowConsequence(null);
                   setGameState(prev => ({ ...prev, isPlaying: true }));
                 }}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-6 rounded-xl font-medium transition-colors"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-4 px-8 rounded-2xl font-bold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
-                Continuar
+                🎮 Continuar Jogo
               </button>
             </div>
           </div>
@@ -714,41 +797,96 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
     <div className={`min-h-screen transition-colors duration-300 ${
       isDark ? 'bg-slate-950' : 'bg-gradient-to-br from-white via-emerald-50/80 to-emerald-100/60'
     }`}>
-      {/* Header */}
-      <header className={`sticky top-0 z-40 backdrop-blur-sm border-b transition-colors duration-300 ${
+      {/* Header Melhorado */}
+      <header className={`sticky top-0 z-40 backdrop-blur-md border-b-2 transition-colors duration-300 ${
         isDark 
-          ? 'bg-slate-900/95 border-slate-800' 
+          ? 'bg-slate-900/95 border-slate-700' 
           : 'bg-white/95 border-gray-200'
       }`}>
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
+            {/* Perfil do Alex */}
             <div className="flex items-center gap-4">
               <button
                 onClick={onBack}
-                className={`p-2 rounded-full transition-colors ${
+                className={`p-3 rounded-full transition-all duration-200 hover:scale-110 ${
                   isDark 
                     ? 'hover:bg-slate-800 text-white' 
                     : 'hover:bg-gray-100 text-gray-900'
                 }`}
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-6 h-6" />
               </button>
-              <div>
-                <h1 className={`text-xl font-bold transition-colors duration-300 ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>Dream Story</h1>
-                <p className={`text-sm transition-colors duration-300 ${
-                  isDark ? 'text-slate-400' : 'text-gray-600'
-                }`}>
-                  {formatTime(gameState.day, gameState.hour, gameState.minute)} | Pontuação: {gameState.score}
-                </p>
+              
+              {/* Avatar e Nome do Alex */}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-xl">👨‍💼</span>
+                </div>
+                <div>
+                  <h2 className={`text-lg font-bold transition-colors duration-300 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>Alex</h2>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isDark ? 'text-slate-400' : 'text-gray-600'
+                  }`}>Protagonista</p>
+                </div>
               </div>
             </div>
 
+            {/* Info do Jogo */}
+            <div className="flex items-center gap-4">
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-300 ${
+                isDark ? 'bg-slate-800' : 'bg-gray-100'
+              }`}>
+                <Calendar className="w-4 h-4 text-emerald-400" />
+                <span className={`text-sm font-medium transition-colors duration-300 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Dia {gameState.day}
+                </span>
+              </div>
+              
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-300 ${
+                isDark ? 'bg-slate-800' : 'bg-gray-100'
+              }`}>
+                <Clock className="w-4 h-4 text-blue-400" />
+                <span className={`text-sm font-medium transition-colors duration-300 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {gameState.hour.toString().padStart(2, '0')}:{gameState.minute.toString().padStart(2, '0')}
+                </span>
+              </div>
+
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors duration-300 ${
+                isDark ? 'bg-slate-800' : 'bg-gray-100'
+              }`}>
+                <Trophy className="w-4 h-4 text-yellow-400" />
+                <span className={`text-sm font-medium transition-colors duration-300 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {gameState.score}
+                </span>
+              </div>
+            </div>
+
+            {/* Controles */}
             <div className="flex items-center gap-2">
               <button
+                onClick={saveGame}
+                className={`p-3 rounded-full transition-all duration-200 hover:scale-110 ${
+                  isDark 
+                    ? 'hover:bg-slate-800 text-emerald-400' 
+                    : 'hover:bg-gray-100 text-emerald-600'
+                }`}
+                title="Salvar Jogo"
+              >
+                <Save className="w-5 h-5" />
+              </button>
+              
+              <button
                 onClick={toggleGame}
-                className={`p-2 rounded-full transition-colors ${
+                className={`p-3 rounded-full transition-all duration-200 hover:scale-110 ${
                   gameState.isPlaying
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-emerald-500 hover:bg-emerald-600 text-white'
@@ -756,13 +894,15 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
               >
                 {gameState.isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </button>
+              
               <button
                 onClick={resetGame}
-                className={`p-2 rounded-full transition-colors ${
+                className={`p-3 rounded-full transition-all duration-200 hover:scale-110 ${
                   isDark 
-                    ? 'hover:bg-slate-800 text-white' 
-                    : 'hover:bg-gray-100 text-gray-900'
+                    ? 'hover:bg-slate-800 text-orange-400' 
+                    : 'hover:bg-gray-100 text-orange-600'
                 }`}
+                title="Resetar Jogo"
               >
                 <RotateCcw className="w-5 h-5" />
               </button>
@@ -771,76 +911,189 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
         </div>
       </header>
 
-      <div className="px-6 py-6">
-        {/* Fatores */}
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          {Object.entries(gameState.factors).map(([factor, value]) => (
-            <div
-              key={factor}
-              className={`backdrop-blur-sm rounded-xl p-4 border transition-colors duration-300 ${
-                isDark 
-                  ? 'bg-slate-900/50 border-slate-800' 
-                  : 'bg-white/80 border-gray-200 shadow-sm'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <div className={getFactorColor(factor, value)}>
-                  {getFactorIcon(factor)}
-                </div>
-                <span className={`text-xs font-medium capitalize transition-colors duration-300 ${
+      {/* Mensagem de Save */}
+      {showSaveMessage && (
+        <div className="fixed top-20 right-6 z-50">
+          <div className={`px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
+            isDark ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
+          }`}>
+            <div className="flex items-center gap-2">
+              <Save className="w-4 h-4" />
+              <span className="text-sm font-medium">Jogo salvo!</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="px-6 py-6 max-w-7xl mx-auto">
+        {/* Seção de Status Melhorada */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Fatores */}
+          <div className="lg:col-span-2">
+            <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 transition-colors duration-300 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              <Heart className="w-6 h-6 text-red-400" />
+              Status de Alex
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {Object.entries(gameState.factors).map(([factor, value]) => {
+                const IconComponent = getFactorIcon(factor);
+                return (
+                  <div
+                    key={factor}
+                    className={`backdrop-blur-sm rounded-2xl p-4 border-2 transition-all duration-300 hover:scale-105 ${
+                      isDark 
+                        ? 'bg-slate-900/50 border-slate-700' 
+                        : 'bg-white/80 border-gray-200 shadow-lg'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-full ${
+                        isDark ? 'bg-slate-800' : 'bg-gray-100'
+                      }`}>
+                        <IconComponent className={`w-5 h-5 ${getFactorColor(factor, value)}`} />
+                      </div>
+                      <span className={`text-sm font-bold capitalize transition-colors duration-300 ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {factor === 'health' ? 'Saúde' : 
+                         factor === 'sleep' ? 'Sono' :
+                         factor === 'energy' ? 'Energia' :
+                         factor === 'productivity' ? 'Produtividade' : 'Social'}
+                      </span>
+                    </div>
+                    <div className={`rounded-full h-3 mb-2 transition-colors duration-300 ${
+                      isDark ? 'bg-slate-800' : 'bg-gray-200'
+                    }`}>
+                      <div
+                        className={`h-3 rounded-full transition-all duration-500 ${getFactorBgColor(factor, value)}`}
+                        style={{ width: `${value}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className={`text-lg font-bold transition-colors duration-300 ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {Math.round(value)}%
+                      </span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        value >= 70 ? 'bg-green-100 text-green-800' :
+                        value >= 40 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {value >= 70 ? 'Ótimo' : value >= 40 ? 'Regular' : 'Baixo'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Informações do Tempo */}
+          <div>
+            <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 transition-colors duration-300 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              <Clock className="w-6 h-6 text-blue-400" />
+              Tempo
+            </h3>
+            <div className={`backdrop-blur-sm rounded-2xl p-6 border-2 transition-colors duration-300 ${
+              isDark 
+                ? 'bg-slate-900/50 border-slate-700' 
+                : 'bg-white/80 border-gray-200 shadow-lg'
+            }`}>
+              <div className="text-center mb-4">
+                <div className={`text-3xl font-bold mb-2 transition-colors duration-300 ${
                   isDark ? 'text-white' : 'text-gray-900'
                 }`}>
-                  {factor === 'health' ? 'Saúde' : 
-                   factor === 'sleep' ? 'Sono' :
-                   factor === 'energy' ? 'Energia' :
-                   factor === 'productivity' ? 'Produtividade' : 'Social'}
-                </span>
+                  {formatTime(gameState.day, gameState.hour, gameState.minute)}
+                </div>
+                <div className={`text-sm transition-colors duration-300 ${
+                  isDark ? 'text-slate-400' : 'text-gray-600'
+                }`}>
+                  Desafio de 14 dias
+                </div>
               </div>
-              <div className={`rounded-full h-2 mb-1 transition-colors duration-300 ${
-                isDark ? 'bg-slate-800' : 'bg-gray-200'
-              }`}>
-                <div
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    value >= 70 ? 'bg-green-500' : 
-                    value >= 40 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${value}%` }}
-                />
+              
+              {/* Controles de Velocidade */}
+              <div className="flex justify-center">
+                <div className={`flex items-center gap-2 p-2 rounded-xl transition-colors duration-300 ${
+                  isDark 
+                    ? 'bg-slate-800 border border-slate-700' 
+                    : 'bg-gray-100 border border-gray-200'
+                }`}>
+                  <span className={`text-sm font-medium transition-colors duration-300 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    Velocidade:
+                  </span>
+                  {[1, 2, 4].map((speed) => (
+                    <button
+                      key={speed}
+                      onClick={() => setGameState(prev => ({ ...prev, gameSpeed: speed }))}
+                      className={`px-3 py-1 rounded-lg text-sm font-bold transition-all duration-200 ${
+                        gameState.gameSpeed === speed
+                          ? 'bg-emerald-500 text-white shadow-lg'
+                          : isDark
+                            ? 'hover:bg-slate-700 text-slate-300'
+                            : 'hover:bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
               </div>
-              <span className={`text-xs transition-colors duration-300 ${
-                isDark ? 'text-slate-400' : 'text-gray-600'
-              }`}>
-                {Math.round(value)}%
-              </span>
             </div>
-          ))}
+          </div>
         </div>
 
         {/* Atividade Atual */}
         {gameState.currentActivity && (
-          <div className={`backdrop-blur-sm rounded-xl p-4 border mb-6 transition-colors duration-300 ${
+          <div className={`backdrop-blur-sm rounded-2xl p-6 border-2 mb-8 transition-all duration-300 ${
             isDark 
-              ? 'bg-emerald-500/10 border-emerald-500/30' 
-              : 'bg-emerald-100/80 border-emerald-300/50 shadow-sm'
+              ? 'bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 border-emerald-500/30' 
+              : 'bg-gradient-to-r from-emerald-100/80 to-emerald-200/60 border-emerald-400/50 shadow-lg'
           }`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`font-medium transition-colors duration-300 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                {activities[gameState.currentActivity as keyof typeof activities].icon} {' '}
-                {activities[gameState.currentActivity as keyof typeof activities].name}
-              </span>
-              <span className={`text-sm transition-colors duration-300 ${
-                isDark ? 'text-slate-400' : 'text-gray-600'
-              }`}>
-                {Math.round((gameState.activityProgress / gameState.activityDuration) * 100)}%
-              </span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                  {React.createElement(activities[gameState.currentActivity as keyof typeof activities].icon, {
+                    className: "w-6 h-6 text-emerald-400"
+                  })}
+                </div>
+                <div>
+                  <span className={`text-lg font-bold transition-colors duration-300 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {activities[gameState.currentActivity as keyof typeof activities].name}
+                  </span>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isDark ? 'text-slate-400' : 'text-gray-600'
+                  }`}>
+                    Em andamento...
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className={`text-2xl font-bold transition-colors duration-300 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {Math.round((gameState.activityProgress / gameState.activityDuration) * 100)}%
+                </div>
+                <div className={`text-sm transition-colors duration-300 ${
+                  isDark ? 'text-slate-400' : 'text-gray-600'
+                }`}>
+                  {Math.round(gameState.activityDuration - gameState.activityProgress)}min restantes
+                </div>
+              </div>
             </div>
-            <div className={`rounded-full h-2 transition-colors duration-300 ${
+            <div className={`rounded-full h-4 transition-colors duration-300 ${
               isDark ? 'bg-slate-800' : 'bg-gray-200'
             }`}>
               <div
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-4 rounded-full transition-all duration-500 shadow-lg"
                 style={{ width: `${(gameState.activityProgress / gameState.activityDuration) * 100}%` }}
               />
             </div>
@@ -848,87 +1101,122 @@ const DreamStoryGame: React.FC<DreamStoryGameProps> = ({ onBack }) => {
         )}
 
         {/* Navegação de Quartos */}
-        <div className="grid grid-cols-5 gap-2 mb-6">
-          {Object.entries(rooms).map(([roomId, room]) => (
-            <button
-              key={roomId}
-              onClick={() => changeRoom(roomId)}
-              disabled={!!gameState.currentActivity}
-              className={`p-3 rounded-xl text-center transition-all duration-200 ${
-                gameState.currentRoom === roomId
-                  ? 'bg-emerald-500 text-white'
-                  : isDark
-                    ? 'bg-slate-800 hover:bg-slate-700 text-white'
-                    : 'bg-white hover:bg-gray-100 text-gray-900 border border-gray-200'
-              } ${gameState.currentActivity ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <Home className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-xs font-medium">{room.name}</span>
-            </button>
-          ))}
+        <div className="mb-8">
+          <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 transition-colors duration-300 ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}>
+            <Home className="w-6 h-6 text-indigo-400" />
+            Escolha o Local
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {Object.entries(rooms).map(([roomId, room]) => {
+              const IconComponent = room.icon;
+              return (
+                <button
+                  key={roomId}
+                  onClick={() => changeRoom(roomId)}
+                  disabled={!!gameState.currentActivity}
+                  className={`p-6 rounded-2xl text-center transition-all duration-200 hover:scale-105 border-2 ${
+                    gameState.currentRoom === roomId
+                      ? `bg-gradient-to-br ${room.color} border-emerald-500 shadow-lg`
+                      : isDark
+                        ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                        : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-lg'
+                  } ${gameState.currentActivity ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <IconComponent className={`w-8 h-8 mx-auto mb-3 ${
+                    gameState.currentRoom === roomId ? 'text-emerald-600' : 
+                    isDark ? 'text-slate-300' : 'text-gray-600'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    gameState.currentRoom === roomId ? 'text-emerald-600' : ''
+                  }`}>
+                    {room.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Atividades do Quarto Atual */}
-        <div className="grid grid-cols-3 gap-4">
-          {rooms[gameState.currentRoom as keyof typeof rooms].activities.map((activityId) => {
-            const activity = activities[activityId as keyof typeof activities];
-            const isCompleted = gameState.completedActivities.includes(activityId);
-            
-            return (
-              <button
-                key={activityId}
-                onClick={() => startActivity(activityId)}
-                disabled={!!gameState.currentActivity}
-                className={`p-4 rounded-xl text-center transition-all duration-200 ${
-                  gameState.currentActivity
-                    ? 'opacity-50 cursor-not-allowed'
-                    : isDark
-                      ? 'bg-slate-800 hover:bg-slate-700 text-white'
-                      : 'bg-white hover:bg-gray-100 text-gray-900 border border-gray-200'
-                } ${isCompleted ? 'ring-2 ring-emerald-500' : ''}`}
-              >
-                <div className="text-2xl mb-2">{activity.icon}</div>
-                <div className="text-sm font-medium mb-1">{activity.name}</div>
-                <div className={`text-xs transition-colors duration-300 ${
-                  isDark ? 'text-slate-400' : 'text-gray-600'
-                }`}>
-                  {activity.duration}min
-                </div>
-                {isCompleted && (
-                  <div className="text-xs text-emerald-500 mt-1">✓ Concluído</div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Controles de Velocidade */}
-        <div className="mt-6 flex justify-center">
-          <div className={`flex items-center gap-2 p-2 rounded-xl transition-colors duration-300 ${
-            isDark 
-              ? 'bg-slate-900/50 border border-slate-800' 
-              : 'bg-white/80 border border-gray-200 shadow-sm'
+        <div>
+          <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 transition-colors duration-300 ${
+            isDark ? 'text-white' : 'text-gray-900'
           }`}>
-            <span className={`text-sm font-medium transition-colors duration-300 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Velocidade:
-            </span>
-            {[1, 2, 4].map((speed) => (
-              <button
-                key={speed}
-                onClick={() => setGameState(prev => ({ ...prev, gameSpeed: speed }))}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                  gameState.gameSpeed === speed
-                    ? 'bg-emerald-500 text-white'
-                    : isDark
-                      ? 'hover:bg-slate-700 text-slate-300'
-                      : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                {speed}x
-              </button>
-            ))}
+            <Settings className="w-6 h-6 text-purple-400" />
+            Atividades - {rooms[gameState.currentRoom as keyof typeof rooms].name}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms[gameState.currentRoom as keyof typeof rooms].activities.map((activityId) => {
+              const activity = activities[activityId as keyof typeof activities];
+              const isCompleted = gameState.completedActivities.includes(activityId);
+              const IconComponent = activity.icon;
+              
+              return (
+                <button
+                  key={activityId}
+                  onClick={() => startActivity(activityId)}
+                  disabled={!!gameState.currentActivity}
+                  className={`p-6 rounded-2xl text-center transition-all duration-200 hover:scale-105 border-2 relative ${
+                    gameState.currentActivity
+                      ? 'opacity-50 cursor-not-allowed'
+                      : isDark
+                        ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                        : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-200 shadow-lg'
+                  } ${isCompleted ? 'ring-2 ring-emerald-500' : ''}`}
+                >
+                  {isCompleted && (
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  )}
+                  
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-slate-700' : 'bg-gray-100'
+                  }`}>
+                    <IconComponent className={`w-8 h-8 ${activity.color}`} />
+                  </div>
+                  
+                  <div className={`text-lg font-bold mb-2 transition-colors duration-300 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {activity.name}
+                  </div>
+                  
+                  <div className={`text-sm mb-3 transition-colors duration-300 ${
+                    isDark ? 'text-slate-400' : 'text-gray-600'
+                  }`}>
+                    ⏱️ {activity.duration} minutos
+                  </div>
+                  
+                  {/* Efeitos da Atividade */}
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {Object.entries(activity.effects).map(([effect, value]) => (
+                      <span
+                        key={effect}
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          value > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {value > 0 ? '+' : ''}{value}% {
+                          effect === 'health' ? 'Saúde' : 
+                          effect === 'sleep' ? 'Sono' :
+                          effect === 'energy' ? 'Energia' :
+                          effect === 'productivity' ? 'Produtividade' : 'Social'
+                        }
+                      </span>
+                    ))}
+                  </div>
+                  
+                  {isCompleted && (
+                    <div className="text-xs text-emerald-500 mt-2 font-bold">
+                      ✅ Concluído hoje
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
